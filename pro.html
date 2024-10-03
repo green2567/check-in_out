@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลส่วนตัว</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+    <style>
+        #loadingOverlay {  display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.26); border-radius:15px; 
+            align-items: center; justify-content: center; z-index: 1000; }
+
+        .loading-container { position: relative;  }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .blink { animation: blink 1s infinite; }
+    </style>
+
+</head>
+
+<body class="bg-blue-100 h-screen">
+    <div class="max-w-md mx-auto p-4 mt-4">
+        <input type="hidden" id="displayName" name="displayName" value="J'ame  •">
+        <div class="loading-container">
+            <div id="loadingOverlay">
+                <div class="text-center text-white">ค้นหารายชื่อ..</div>
+            </div>
+            <div class="flex justify-center items-center">
+                <div class="max-w-md">
+                    <div class="bg-white rounded-md shadow-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <img class="h-20 w-full object-cover rounded-md mr-4" id="columnEData"
+                                src="https://lh5.googleusercontent.com/d/1uuIRYCjXxNtDbhvwsk5YyWRUA1LBb5yv">
+                            <div>
+                                <input type="text"
+                                    class="input-field bg-gray-50  text-lg font-bold bg-opacity-0 "
+                                    id="columnBData" placeholder="ชื่อ" name="columnBData" readonly>
+                                <input type="text" class="input-field text-md bg-white  bg-opacity-0 "
+                                    id="columnCData" placeholder="รหัสพนักงาน" name="columnCData" readonly>
+                                <input type="text" class="input-field text-md bg-white  bg-opacity-0 "
+                                    id="columnDData" placeholder="ตำแหน่ง" name="columnDData" readonly>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border rounded">
+    <div class="flex justify-between">
+        <div>
+            <h1 class="font-light text-center p-0.5 text-xs">ลาพักร้อน/กิจ</h1>
+            <input type="text"
+                class="input-field text-md bg-white text-black text-bold text-center bg-opacity-0 py-1 w-full"
+                id="columnGData" placeholder="0" name="columnGData" readonly>
+        </div>
+        <div>
+            <h1 class="font-light text-center text-sm">ลาป่วย</h1>
+            <input type="text"
+                class="input-field text-md bg-white text-black text-bold text-center bg-opacity-0 py-1 w-full"
+                id="columnIData" placeholder="0" name="columnIData" readonly>
+        </div>
+        <div>
+            <h1 class="font-light text-center text-sm">สาย/ก่อน</h1>
+            <input type="text"
+                class="input-field text-md bg-white text-black text-bold text-center bg-opacity-0 py-1 w-full"
+                id="columnHData" placeholder="0" name="columnHData" readonly>
+        </div>
+        <div>
+            <h1 class="font-light text-center text-sm">OT (ชม.)</h1>
+            <input type="text"
+                class="input-field text-md bg-white text-black text-bold text-center bg-opacity-0 py-1 w-full"
+                id="columnJData" placeholder="0" name="columnJData" readonly>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="userId" name="userId">
+<input type="hidden" id="columnAData" name="columnAData">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-md mx-auto py-4">
+            <form>
+                <div class="bg-white relative p-10 shadow-xl rounded-lg w-6/6 mx-auto">
+                    <div class="w-32 mb-5">
+                        <select type="text" id="typeId" name="typeId" class="w-full p-2 rounded ">
+                            <option value="ลาพักร้อน">ลาพักร้อน</option>
+                            <option value="ลาป่วย">ลาป่วย</option>
+                            <option value="ลากิจ">ลากิจ</option>
+                            <option value="ขอทำโอที">ขอทำโอที</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="mt-4 flex justify-between mb-5">
+                        <input type="date" id="startDateId" name="startDateId" class="w-1/2 mr-2 p-2 rounded ">
+                        <input type="date" id="endDateId" name="endDateId" class="w-1/2 ml-2 p-2 rounded ">
+                    </div>
+                    <div id="overtimeFields" style="display: none;">
+                        <div class="mt-4 flex justify-between mb-5">
+                            <input type="time" id="startTimeId" name="startTimeId" class="w-1/2 mr-2 p-2 rounded" placeholder="เวลาเริ่มต้น">
+                            <input type="time" id="endTimeId" name="endTimeId" class="w-1/2 ml-2 p-2 rounded" placeholder="เวลาสิ้นสุด">
+                        </div>
+                        <div class="mt-4 mb-5">
+                            <input type="number" id="overtimeHours" name="overtimeHours" placeholder="จำนวนชั่วโมงโอที" class="w-full p-2 border rounded" readonly>
+                        </div>
+                    </div>
+                    <div class="mt-6 mb-5">
+                        <input type="text" id="titleId" name="titleId" placeholder="หัวข้อเรื่อง"
+                            class="w-full p-2 border rounded ">
+                    </div>
+                    <div class="mt-4 mb-5">
+                        <textarea id="detailId" name="detailId" placeholder="รายละเอียด"
+                            class="w-full p-2 border rounded "></textarea>
+                    </div>
+                    <div class="mb-5 text-center bg-gray-100 border py-4">
+                        <label for="file" class="cursor-pointer inline-flex justify-between items-center">
+                            อัพโหลดเอกสาร
+                            <input type="file" id="file" name="file" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                class="hidden">
+                        </label>
+                        <div class="mx-auto text-gray-500 text-xs text-center mt-1">รูปแบบที่รองรับ jpg jpeg png pdf
+                            doc
+                            docx</div>
+                    </div>
+                    <button type="button" id="submitBtn"
+                        class="bg-gradient-to-b from-gray-800 to-gray-900 text-center w-full text-white py-4 px-4 rounded hover:bg-blue-700">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjN40c7ACwe6hrpUytsVjoribELLrZ3I29mR5pBTb1dmiupq4rbqMjt9kU1TDGwUx/exec'; 
+        const WEB_APP_Leave_URL = 'https://script.google.com/macros/s/AKfycbyq2Lu0JiC8msYx7kMmqIqdggV4o8X37sN_Mejye6dbvUovRLgOknixVGSjYsGyoYFK/exec'; 
+        const LIFF_ID = '2005997953-e3Y8mwz1'; // Liff ID
+
+        let fileInput = document.getElementById("file");
+        let userlineIdInput = document.getElementById("userId");
+        let nameIdInput = document.getElementById("columnBData");
+        let numberIdInput = document.getElementById("columnCData");
+        let roleId = document.getElementById("columnDData");
+        let typeId = document.getElementById("typeId");
+        let startDateId = document.getElementById("startDateId");
+        let endDateId = document.getElementById("endDateId");
+        let titleId = document.getElementById("titleId");
+        let detailId = document.getElementById("detailId");
+        let submitBtn = document.getElementById("submitBtn");
+        let startTimeId = document.getElementById("startTimeId");
+        let endTimeId = document.getElementById("endTimeId");
+        let overtimeHours = document.getElementById("overtimeHours");
+        let overtimeFields = document.getElementById("overtimeFields");
+
+        window.onload = async function () {
+             await initializeLiff();
+        };
+
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: `${LIFF_ID}` });
+                if (liff.isLoggedIn()) {
+                    getUserProfile();
+                } else {
+                    liff.login();
+                }
+            } catch (error) {
+                console.error('Error initializing LIFF:', error);
+            }
+        }
+
+        async function getUserProfile() {
+            try {
+                const profile = await liff.getProfile();
+                const userId = profile.userId;
+                document.getElementById('userId').value = userId;
+                document.getElementById('displayName').value = profile.displayName;
+                await fetchData(userId);
+            } catch (error) {
+                console.error('Error getting profile data:', error);
+            }
+        }
+
+        async function fetchData(userId) {
+            showLoading(true);
+            try {
+                const response = await fetch(`${WEB_APP_URL}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'fetchData', userId: userId })
+                });
+                const data = await response.json();
+                data.sort((a, b) => new Date(b[5]) - new Date(a[5]));
+                const row = data.find(row => row[0] === userId);
+                if (row) {
+                    displayData(row);
+                } else {
+                    console.log('No data found for userId:', userId);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+function displayData(row) {
+    document.getElementById('columnAData').value = row[0] || '';
+    document.getElementById('columnBData').value = row[1] || '';
+    document.getElementById('columnCData').value = row[2] || '';
+    document.getElementById('columnDData').value = row[3] || '';
+    document.getElementById('columnEData').src = row[4] || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+    document.getElementById('columnGData').value = row[11] || '';
+    document.getElementById('columnHData').value = row[12] || '';
+    document.getElementById('columnIData').value = row[8] || '';
+    document.getElementById('columnJData').value = row[9] || '0'; // แสดงข้อมูล OT
+}
+        function showLoading(isLoading) {
+            const overlay = document.getElementById('loadingOverlay');
+            const inputs = document.querySelectorAll('.input-field');
+            if (isLoading) {
+                overlay.style.display = 'flex';
+                inputs.forEach(input => input.disabled = true);
+            } else {
+                overlay.style.display = 'none';
+                inputs.forEach(input => input.disabled = false);
+            }
+        }
+
+        typeId.addEventListener('change', function() {
+            if (this.value === "ขอทำโอที") {
+                overtimeFields.style.display = "block";
+            } else {
+                overtimeFields.style.display = "none";
+            }
+        });
+
+        // เพิ่มการคำนวณชั่วโมงโอทีอัตโนมัติ
+        startTimeId.addEventListener('change', calculateOvertimeHours);
+        endTimeId.addEventListener('change', calculateOvertimeHours);
+
+       function calculateOvertimeHours() {
+            if (startTimeId.value && endTimeId.value) {
+                const start = new Date(`2000-01-01T${startTimeId.value}`);
+                const end = new Date(`2000-01-01T${endTimeId.value}`);
+                if (end < start) end.setDate(end.getDate() + 1);
+                const diff = (end - start) / 1000 / 60 / 60;
+                overtimeHours.value = diff.toFixed(2);
+            }
+        }
+
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                let reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function validateForm() {
+            const userlineId = userlineIdInput.value.trim();
+            const nameId = nameIdInput.value.trim();
+            const roleIdValue = roleId.value.trim();
+            const typeIdValue = typeId.value.trim();
+            const startDateIdValue = startDateId.value.trim();
+            const endDateIdValue = endDateId.value.trim();
+            const titleIdValue = titleId.value.trim();
+            const detailIdValue = detailId.value.trim();
+
+            if (userlineId === '' || nameId === '' || roleIdValue === '' || typeIdValue === '' || startDateIdValue === '' || endDateIdValue === '' || titleIdValue === '' || detailIdValue === '') {
+                return false;
+            }
+
+            if (typeIdValue === "ขอทำโอที") {
+                if (startTimeId.value === '' || endTimeId.value === '' || overtimeHours.value === '') {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        submitBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (!validateForm()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาดการตรวจสอบ',
+                    text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง',
+                });
+                return;
+            }
+
+            const isConfirmed = await showConfirmationDialog();
+
+            if (isConfirmed) {
+                submitBtn.disabled = true;
+
+                try {
+                    let obj = {
+                        userlineId: userlineIdInput.value,
+                        nameId: nameIdInput.value,
+                        roleId: roleId.value,
+                        numberId: numberIdInput.value,
+                        typeId: typeId.value,
+                        startDateId: startDateId.value,
+                        endDateId: endDateId.value,
+                        titleId: titleId.value,
+                        detailId: detailId.value
+                    };
+
+                    if (typeId.value === "ขอทำโอที") {
+                        obj.startTimeId = startTimeId.value;
+                        obj.endTimeId = endTimeId.value;
+                        obj.overtimeHours = overtimeHours.value;
+                    }
+
+                    if (fileInput.files.length > 0) {
+                        let file = fileInput.files[0];
+                        let base64 = await getBase64(file);
+
+                        obj.base64 = base64;
+                        obj.type = file.type;
+                        obj.name = file.name;
+                    }
+
+                    Swal.fire({
+                        title: '<div class="text-md">กำลังบันทึก...</div>',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        html: '<div class="swal2-loading"></div>',
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    let response = await fetch(WEB_APP_Leave_URL, {
+        method: "POST",
+        body: JSON.stringify(obj)
+    });
+
+    let data = await response.json();
+
+    if (data.result === 'success') {
+        Swal.fire({
+            title: 'สำเร็จ!',
+            text: data.message,
+            icon: 'success',
+            confirmButtonText: 'ปิด',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                document.querySelector('form').reset();
+                await sendFlexMessage(obj);
+            }
+        });
+    } else {
+        throw new Error(data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message || 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+                    });
+
+                    console.error(error);
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            } else {
+                Swal.fire('ยกเลิกการส่งข้อมูล', 'ข้อมูลของคุณยังไม่ถูกส่ง', 'info');
+            }
+        });
+
+        async function showConfirmationDialog() {
+            const confirmation = await Swal.fire({
+                title: 'ยืนยันการส่งข้อมูล',
+                text: 'แน่ใจ ว่าคุณกำลังส่งข้อมูล?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่, ส่งข้อมูล!',
+                cancelButtonText: 'ไม่, ยกเลิก'
+            });
+
+            return confirmation.isConfirmed;
+        }
+
+async function sendFlexMessage(data) {
+    let contents = [
+        { type: "text", text: `ชื่อ: ${data.nameId}` },
+        { type: "text", text: `เรื่อง: ${data.typeId}` },
+        { type: "text", text: `วันเริ่มต้น: ${formatDate(data.startDateId)}` },
+        { type: "text", text: `วันสิ้นสุด: ${formatDate(data.endDateId)}` },
+    ];
+
+    if (data.typeId === "ขอทำโอที") {
+        contents.push(
+            { type: "text", text: `เวลาเริ่มต้น: ${data.startTimeId}` },
+            { type: "text", text: `เวลาสิ้นสุด: ${data.endTimeId}` },
+            { type: "text", text: `จำนวนชั่วโมงโอที: ${parseFloat(data.overtimeHours).toFixed(2)} ชั่วโมง` }
+        );
+    }
+
+            contents.push({ type: "text", color: '#2d63c7', text: `📋รอการอนุมัติ` });
+
+            const flexMessage = {
+                type: "flex",
+                altText: data.typeId === "ขอทำโอที" ? "คำขออนุมัติทำโอที" : "คำขออนุมัติการลา",
+                contents: {
+                    type: "bubble",
+                    body: {
+                        type: "box",
+                        layout: "vertical",
+                        contents: [
+                            { type: "text", text: data.typeId === "ขอทำโอที" ? "🟢 คำขออนุมัติทำโอที" : "🟢 คำขออนุมัติการลา", weight: "bold", size: "md", color: "#1DB446" },
+                            {
+                                type: "box", layout: "vertical", margin: "lg", spacing: "sm", contents: contents
+                            }
+                        ]
+                    }
+                }
+            };
+
+            try {
+                await liff.sendMessages([flexMessage]);
+                liff.closeWindow(); // Close the LIFF window 
+                console.log("Flex message sent");
+            } catch (error) {
+                console.error("Error sending Flex message:", error);
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+        }
+
+        // รับวันที่ในรูปแบบ "YYYY-MM-DD"
+        function getFormattedDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // กำหนดค่าของ input เป็นวันที่ปัจจุบัน
+        document.getElementById('startDateId').value = getFormattedDate();
+        document.getElementById('endDateId').value = getFormattedDate();
+
+    </script>
+</body>
+</html>
